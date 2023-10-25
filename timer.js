@@ -1,3 +1,16 @@
+//  Usage:  Functions to calculate and format timing data for FFXI
+//  Written by:  Pyogenes from www.pyogenes.com
+
+///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+//                                                               //
+//    CODE IS FREE FOR USE AS LONG AS YOU GIVE CREDIT            //
+//    1.  List my website as the source                          //
+//    2.  Place a link on the page the code is used in           //
+//                                                               //
+///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+
 // basis date is used to convert real time to game time.
 // Use UTC functions to allow calculations to work for any timezone
 basisDate = new Date();
@@ -769,3 +782,4 @@ function printPage() {
    getAirSched();
    setTimeout("printPage()", 50);
 }
+
