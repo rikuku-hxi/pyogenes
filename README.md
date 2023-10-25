@@ -16,5 +16,5 @@ CODE IS FREE FOR USE AS LONG AS YOU GIVE CREDIT
 
 
 ## TODO
-* Fix Alchemy holiday
 * Add manaclipper
+* Fix Alchemy holiday

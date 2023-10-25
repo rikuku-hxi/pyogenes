@@ -47,6 +47,9 @@ BoatSched = new Array("08:00", "16:00", "00:00");
 BoatSched2 = new Array("06:30", "14:30", "22:30");
 BoatDayOffset = new Array(0,0,7);
 
+bbPIBoatSched = new Array("05:30", "17:30"); //departures from bb to pi
+bbPIBoatSched2 = new Array("09:15", "21:15"); //departures from pi to bb
+
 msGameDay	= (24 * 60 * 60 * 1000 / 25); // milliseconds in a game day
 msRealDay	= (24 * 60 * 60 * 1000); // milliseconds in a real day
 
@@ -384,7 +387,86 @@ function getMoonDetails()  {
 
 }
 
-function getShipSched()  {
+function getShipSched(contentId, countName, sched1, sched2, dailyDepartureCount)  {
+
+   // Boats depart at 00:00, 08:00, 16:00 from both Selbina and Mhuara
+   // Boats arrive at 06:30, 14:30, 22:30 which is 216 seconds before they leave
+
+   var now = new Date();
+   var timeDiff = now.getTime() - basisDate.getTime();
+   var hours = Math.floor((timeDiff / ( msGameDay / 3)) % 3);
+
+   var timeLeft = (msGameDay / 3 ) - (timeDiff % (msGameDay / 3));
+
+   var repeatFerry = document.Timer[countName].value;
+
+   bSched = "<TABLE CLASS='blank' CELLSPACING='0' CELLPADDING='0'><TR><TH WIDTH='80' ALIGN='left'>Arrives</TH>";
+   bSched = bSched + "<TH WIDTH='45'></TH><TH ALIGN='left' WIDTH='80'>ETA</TH>";
+   bSched = bSched + "<TH WIDTH='80' ALIGN='left'>Departs</TH><TH WIDTH='45'></TH>";
+   bSched = bSched + "<TH ALIGN='left' WIDTH='45'>ETD</TH></TR>";
+
+   vanaDate =  ((898 * 360 + 30) * msRealDay) + (timeDiff) * 25;
+   vDay  = Math.floor((vanaDate % (8 * msRealDay)) / (msRealDay));
+
+   for ( i = 0; i < repeatFerry; i++) {
+      timeLeftLoop = timeLeft + ( i* msGameDay / 3);
+      dPos = (vDay + Math.floor((hours + 1 + i)/3)) % 8;
+      dPos2 = (dPos + BoatDayOffset[(hours + i) % 3]) % 8;
+      arrivalTime = timeLeftLoop - 216000;
+      if (arrivalTime <= 0)
+         arrivalTime = 0;
+
+      bSched = bSched + '<TR><TD><FONT COLOR="' + DayColor[dPos2] + '">' + VanaDay[dPos2] + '</FONT></TD><TD>' + sched2[(hours + i) % dailyDepartureCount] + '</TD><TD>' + formatCountdown(arrivalTime) + '</TD><TD><FONT COLOR="' + DayColor[dPos] + '">' + VanaDay[dPos] + '</FONT></TD><TD>' + sched1[(hours + i) % dailyDepartureCount] + '</TD><TD ALIGN="left">' + formatCountdown(timeLeftLoop) + '</TD></TR>';
+   }
+
+   if (repeatFerry < 1) { out = ''; } else { out = bSched + "</TABLE>"; }
+   document.getElementById(contentId).innerHTML = out;
+
+}
+
+function getBBPIManaclippserSched()  {
+
+   // Boats depart at 00:00, 08:00, 16:00 from both Selbina and Mhuara
+   // Boats arrive at 06:30, 14:30, 22:30 which is 216 seconds before they leave
+   var now = new Date();
+   var timeDiff = now.getTime() - basisDate.getTime();
+   var hours = Math.floor((timeDiff / ( msGameDay / 3)) % 3);
+
+   var timeLeft = (msGameDay / 3 ) - (timeDiff % (msGameDay / 3));
+
+   var repeatFerry = document.Timer.bbpiManaclipperCount.value;
+
+   bSched = "<TABLE CLASS='blank' CELLSPACING='0' CELLPADDING='0'><TR><TH WIDTH='80' ALIGN='left'>Arrives</TH>";
+   bSched = bSched + "<TH WIDTH='45'></TH><TH ALIGN='left' WIDTH='80'>ETA</TH>";
+   bSched = bSched + "<TH WIDTH='80' ALIGN='left'>Departs</TH><TH WIDTH='45'></TH>";
+   bSched = bSched + "<TH ALIGN='left' WIDTH='45'>ETD</TH></TR>";
+
+   vanaDate =  ((898 * 360 + 30) * msRealDay) + (timeDiff) * 25;
+   vDay  = Math.floor((vanaDate % (8 * msRealDay)) / (msRealDay));
+
+   for ( i = 0; i < repeatFerry; i++) {
+      timeLeftLoop = timeLeft + ( i* msGameDay / 3);
+      dPos = (vDay + Math.floor((hours + 1 + i)/3)) % 8;
+      dPos2 = (dPos + BoatDayOffset[(hours + i) % 3]) % 8;
+      arrivalTime = timeLeftLoop - 216000;
+      if (arrivalTime <= 0)
+         arrivalTime = 0;
+
+      bSched = bSched + '<TR><TD><FONT COLOR="' + 
+                              DayColor[dPos2] + '">' + 
+                              VanaDay[dPos2] + '</FONT></TD><TD>' + 
+                              bbPIBoatSched2[(hours + i) % 2] + '</TD><TD>' + 
+                              formatCountdown(arrivalTime) + '</TD><TD><FONT COLOR="' + 
+                              DayColor[dPos] + '">' + VanaDay[dPos] + '</FONT></TD><TD>' + 
+                              bbPIBoatSched[(hours + i) % 2] + '</TD><TD ALIGN="left">' + formatCountdown(timeLeftLoop) + '</TD></TR>';
+   }
+
+   if (repeatFerry < 1) { out = ''; } else { out = bSched + "</TABLE>"; }
+   document.getElementById("bbpiManaclipper").innerHTML = out;
+
+}
+
+function getSelbinaMhauraSched()  {
 
    // Boats depart at 00:00, 08:00, 16:00 from both Selbina and Mhuara
    // Boats arrive at 06:30, 14:30, 22:30 which is 216 seconds before they leave
@@ -776,7 +858,10 @@ function printPage() {
    getMoonPhase();
    getRSE();
    getConquest();
-   getShipSched();
+   getShipSched('ferry', 'FerryCount', BoatSched, BoatSched2, 3); //selbina-mhaura
+   getShipSched('bbpiManaclipper','bbpiManaclipperCount', bbPIBoatSched, bbPIBoatSched2, 2); //Bibiki Bay (Sunset Docks) To Purgonorgo Isle
+   //getShipSched('bbpiManaclipper', 'bbpiManaclipperCount', 1); //Bibiki Bay (Sunset Docks) To Purgonorgo Isle
+   //getBBPIManaclippserSched();
    getDaySched();
    getGuildHours();
    getAirSched();
