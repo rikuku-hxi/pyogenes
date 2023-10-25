@@ -12,8 +12,9 @@ CODE IS FREE FOR USE AS LONG AS YOU GIVE CREDIT
 
 
 ## Updates
-#### 10/25/23: initial 
+* 10/25/23: initial 
 
 
 ## TODO
-#### Add manaclipper
+* Fix Alchemy holiday
+* Add manaclipper
