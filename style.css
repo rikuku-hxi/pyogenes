@@ -90,3 +90,10 @@ A.hdline {
     border-left:.5pt solid orange;
     background-color:white;
 }
+
+.char-avatar.svelte-1daegyy.svelte-1daegyy {
+    border-radius: 50%;
+    margin-right: 8px;
+    object-fit: cover;
+}
+

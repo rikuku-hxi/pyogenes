@@ -424,7 +424,7 @@ function getShipSched(contentId, countName, sched1, sched2, dailyDepartureCount)
 
 }
 
-function getBBPIManaclippserSched()  {
+function getBBMRTManaclipperSched()  {
 
    // Boats depart at 00:00, 08:00, 16:00 from both Selbina and Mhuara
    // Boats arrive at 06:30, 14:30, 22:30 which is 216 seconds before they leave
@@ -860,8 +860,7 @@ function printPage() {
    getConquest();
    getShipSched('ferry', 'FerryCount', BoatSched, BoatSched2, 3); //selbina-mhaura
    getShipSched('bbpiManaclipper','bbpiManaclipperCount', bbPIBoatSched, bbPIBoatSched2, 2); //Bibiki Bay (Sunset Docks) To Purgonorgo Isle
-   //getShipSched('bbpiManaclipper', 'bbpiManaclipperCount', 1); //Bibiki Bay (Sunset Docks) To Purgonorgo Isle
-   //getBBPIManaclippserSched();
+   //getBBMRTManaclipperSched();
    getDaySched();
    getGuildHours();
    getAirSched();
