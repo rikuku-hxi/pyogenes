@@ -50,6 +50,8 @@ BoatDayOffset = new Array(0,0,7);
 bbPIBoatSched = new Array("05:30", "17:30"); //departures from bb to pi
 bbPIBoatSched2 = new Array("09:15", "21:15"); //departures from pi to bb
 
+bbRMTBoatSched = new Array("12:50", "12:50"); //departures from bb to pi
+
 msGameDay	= (24 * 60 * 60 * 1000 / 25); // milliseconds in a game day
 msRealDay	= (24 * 60 * 60 * 1000); // milliseconds in a real day
 
@@ -387,7 +389,7 @@ function getMoonDetails()  {
 
 }
 
-function getShipSched(contentId, countName, sched1, sched2, dailyDepartureCount, showCountdown)  {
+function getShipSched(contentId, countName, sched1, sched2, dailyDepartureCount)  {
 
    // Boats depart at 00:00, 08:00, 16:00 from both Selbina and Mhuara
    // Boats arrive at 06:30, 14:30, 22:30 which is 216 seconds before they leave
@@ -396,7 +398,7 @@ function getShipSched(contentId, countName, sched1, sched2, dailyDepartureCount,
    var timeDiff = now.getTime() - basisDate.getTime();
    var hours = Math.floor((timeDiff / ( msGameDay / dailyDepartureCount)) % 3);
 
-   var timeLeft = (msGameDay /dailyDepartureCount ) - (timeDiff % (msGameDay /  dailyDepartureCount));
+   var timeLeft = (msGameDay / dailyDepartureCount ) - (timeDiff % (msGameDay / dailyDepartureCount));
 
    var repeatFerry = document.Timer[countName].value;
 
@@ -432,17 +434,17 @@ function getShipSched(contentId, countName, sched1, sched2, dailyDepartureCount,
 
 }
 
-function getBBMRTManaclipperSched()  {
+function getManaclipperSched(contentId, countName, sched1, sched2, dailyDepartureCount)  {
 
-   // Boats depart at 00:00, 08:00, 16:00 from both Selbina and Mhuara
-   // Boats arrive at 06:30, 14:30, 22:30 which is 216 seconds before they leave
    var now = new Date();
    var timeDiff = now.getTime() - basisDate.getTime();
-   var hours = Math.floor((timeDiff / ( msGameDay / 3)) % 3);
+   var hours = Math.floor((timeDiff / ( msGameDay / dailyDepartureCount)) % 3);
 
-   var timeLeft = (msGameDay / 3 ) - (timeDiff % (msGameDay / 3));
+   var timeLeft = (msGameDay / dailyDepartureCount ) - (timeDiff % (msGameDay / dailyDepartureCount));
 
-   var repeatFerry = document.Timer.bbpiManaclipperCount.value;
+   //console.log('timeLeft is ' + timeLeft);
+
+   var repeatFerry = document.Timer[countName].value;
 
    bSched = "<TABLE CLASS='blank' CELLSPACING='0' CELLPADDING='0'><TR><TH WIDTH='80' ALIGN='left'>Arrives</TH>";
    bSched = bSched + "<TH WIDTH='45'></TH><TH ALIGN='left' WIDTH='80'>ETA</TH>";
@@ -453,24 +455,30 @@ function getBBMRTManaclipperSched()  {
    vDay  = Math.floor((vanaDate % (8 * msRealDay)) / (msRealDay));
 
    for ( i = 0; i < repeatFerry; i++) {
-      timeLeftLoop = timeLeft + ( i* msGameDay / 3);
-      dPos = (vDay + Math.floor((hours + 1 + i)/3)) % 8;
-      dPos2 = (dPos + BoatDayOffset[(hours + i) % 3]) % 8;
-      arrivalTime = timeLeftLoop - 216000;
+      dPos = (vDay + Math.floor((hours + 1 + i)/ dailyDepartureCount)) % 8;
+      dPos2 = (dPos + BoatDayOffset[(hours + i) % dailyDepartureCount]) % 8;
+      
+      timeLeftLoop = timeLeft + ( i * msGameDay / dailyDepartureCount);
+      //console.log('timeLeftLoop is ' + timeLeftLoop);
+      arrivalTime = timeLeftLoop - 516000;
+
+      //console.log('arrivalTime is ' + arrivalTime);
       if (arrivalTime <= 0)
          arrivalTime = 0;
 
-      bSched = bSched + '<TR><TD><FONT COLOR="' + 
+         bSched = bSched + '<TR><TD><FONT COLOR="' + 
                               DayColor[dPos2] + '">' + 
                               VanaDay[dPos2] + '</FONT></TD><TD>' + 
-                              bbPIBoatSched2[(hours + i) % 2] + '</TD><TD>' + 
+                              sched2[(hours + i) % dailyDepartureCount] + '</TD><TD>' + 
                               formatCountdown(arrivalTime) + '</TD><TD><FONT COLOR="' + 
-                              DayColor[dPos] + '">' + VanaDay[dPos] + '</FONT></TD><TD>' + 
-                              bbPIBoatSched[(hours + i) % 2] + '</TD><TD ALIGN="left">' + formatCountdown(timeLeftLoop) + '</TD></TR>';
+                              DayColor[dPos] + '">' + 
+                              VanaDay[dPos] + '</FONT></TD><TD>' + 
+                              sched1[(hours + i) % dailyDepartureCount] + '</TD><TD ALIGN="left">' + 
+                              formatCountdown(timeLeftLoop) + '</TD></TR>';
    }
 
    if (repeatFerry < 1) { out = ''; } else { out = bSched + "</TABLE>"; }
-   document.getElementById("bbpiManaclipper").innerHTML = out;
+   document.getElementById(contentId).innerHTML = out;
 
 }
 
@@ -830,9 +838,9 @@ function printPage() {
    getMoonPhase();
    getRSE();
    getConquest();
-   getShipSched('ferry', 'FerryCount', BoatSched, BoatSched2, 3, true); //selbina-mhaura
-   getShipSched('bbpiManaclipper','bbpiManaclipperCount', bbPIBoatSched, bbPIBoatSched2, 2, false); //Bibiki Bay (Sunset Docks) To Purgonorgo Isle
-   //getBBMRTManaclipperSched();
+   getShipSched('ferry', 'FerryCount', BoatSched, BoatSched2, 3); //selbina-mhaura
+   getManaclipperSched('bbpiManaclipper','bbpiManaclipperCount', bbPIBoatSched, bbPIBoatSched2, 2); //Bibiki Bay (Sunset Docks) To Purgonorgo Isle
+   //getManaclipperSched('bbmrtManaclipper', 'bbmrtManaclipperCount', bbRMTBoatSched, bbRMTBoatSched2, 1);
    getDaySched();
    getGuildHours();
    getAirSched();
